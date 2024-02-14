@@ -20,7 +20,23 @@ class UploadFileAPIView(ModelViewSet):
     def get_queryset(self):
         return Video.objects.filter(id=self.kwargs.get('pk'))
 
+    def create(self, request, *args, **kwargs):
+        """ Create video file
+
+        Only MP4 extension is supported
+
+        """
+        return super().create(request, *args, **kwargs)
+
     def update(self, request, pk=None, **kwargs):
+        """
+        Update the  Video entity by cropping
+
+        body params:
+        - width: int
+        - height: int
+        :return: Bool value of correct upload task of cropping
+        """
         width = self.request.data.get("width", None)
         height = self.request.data.get("height", None)
         if not (width and height):
@@ -33,6 +49,14 @@ class UploadFileAPIView(ModelViewSet):
         return Response({"success": True}, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None, **kwargs):
+        """
+        Get information about Video Entity and about last cropping task of it
+
+        url parameters:
+        - pk: str
+
+        :return: Video entity date
+        """
         file = get_object_or_404(Video.objects, id=pk)
         if file.last_crop_task_id:
             result = AsyncResult(file.last_crop_task_id)
@@ -51,5 +75,13 @@ class UploadFileAPIView(ModelViewSet):
                 "processingSuccess": None
             }
         return Response(data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete Video Entity by id
+
+        :return: Bool value about success delete
+        """
+        return super().destroy(request, *args, **kwargs)
 
 
