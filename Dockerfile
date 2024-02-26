@@ -22,8 +22,7 @@ RUN apt-get install -y ffmpeg
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
-COPY poetry.lock pyproject.toml /app/
+COPY ./pyproject.toml /app/
 
 RUN poetry install --no-interaction --no-ansi
-
 ADD . /app
